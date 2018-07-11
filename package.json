@@ -1,0 +1,46 @@
+{
+  "name": "request",
+  "main": "index.js",
+  "module": "dist/request.es.js",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/wallynm/request#readme",
+  "author": "",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "cross-env NODE_ENV=production rollup -c rollup.config.js",
+    "prebuild": "npm-run-all lint test",
+    "watch": "cross-env NODE_ENV=production rollup -w -c rollup.config.js",
+    "start": "npm run watch",
+    "lint": "eslint src/**/*.{js,jsx}"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wallynm/request.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wallynm/request/issues"
+  },
+  "devDependencies": {
+    "babel-eslint": "^8.2.5",
+    "babel-plugin-external-helpers": "^6.22.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-standalone": "^6.26.0",
+    "chai": "^4.1.2",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.1.0",
+    "mocha": "^5.2.0",
+    "npm-run-all": "^4.1.3",
+    "rollup": "^0.62.0",
+    "rollup-plugin-babel": "^3.0.7",
+    "rollup-plugin-commonjs": "^9.1.3",
+    "rollup-plugin-node-resolve": "^3.3.0",
+    "rollup-plugin-replace": "^2.0.0",
+    "rollup-watch": "^4.3.1"
+  },
+  "dependencies": {
+    "axios": "^0.18.0"
+  }
+}
