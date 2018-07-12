@@ -38,3 +38,4 @@ Request.fetch('fetch.posts')
 ```
 
 ### Testing
+Just run `yarn test` or `npm run test` and the command line will start a local server wich will be test every single route and parameters related to the js API.
