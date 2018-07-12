@@ -1,21 +1,39 @@
-import resolve from 'rollup-plugin-node-resolve';
-import commonjs from 'rollup-plugin-commonjs';
-import json from 'rollup-plugin-json';
-import pkg from './package.json';
+import resolve from 'rollup-plugin-node-resolve'
+import commonjs from 'rollup-plugin-commonjs'
+import builtins from 'rollup-plugin-node-builtins';
+import globals from 'rollup-plugin-node-globals';
+import json from 'rollup-plugin-json'
+import pkg from './package.json'
+
+
+const onwarn = warning => {
+  // Silence circular dependency warning for moment
+  if (warning.code === 'CIRCULAR_DEPENDENCY') {
+    return
+  }
+
+  console.warn(`(!) ${warning.message}`)
+}
 
 export default [
 	// browser-friendly UMD build
 	{
+		onwarn,
 		input: 'src/index.js',
 		output: {
 			name: 'howLongUntilLunch',
 			file: pkg.browser,
-			format: 'umd'
+			format: 'umd',
+			globals: {
+				'url' : 'url' 
+			}
 		},
 		plugins: [
 			json(),
-			resolve(), // so Rollup can find `ms`
-			commonjs() // so Rollup can convert `ms` to an ES module
+			globals(),
+			builtins(),
+			resolve(),
+			commonjs()
 		]
 	},
 	
@@ -26,6 +44,7 @@ export default [
 	// an array for the `output` option, where we can specify 
 	// `file` and `format` for each target)
 	{
+		onwarn,
 		input: 'src/index.js',
 		external: ['axios'],
 		output: [
@@ -33,4 +52,4 @@ export default [
 			{ file: pkg.module, format: 'es' }
 		]
 	}
-];
+]
