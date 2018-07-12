@@ -1,26 +1,4 @@
-# request [![NPM version][npm-image]][npm-url] 
+### Intro
+This project is a wrapper from axios HTTP client
 
-> 
-
-## Installation
-
-```sh
-$ npm install --save request
-```
-
-## Usage
-
-```js
-import request from 'request';
-
-request(params);
-```
-
-## License
-
-MIT © [Wallysson Nunes](https://medium.com/@wallynm/)
-
-
-[npm-image]: https://badge.fury.io/js/request.svg
-[npm-url]: https://npmjs.org/package/request
-
+It exports a singleton and trought methods we can register API methods so we can access them later trougth this API.
