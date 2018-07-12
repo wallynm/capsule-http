@@ -34,7 +34,7 @@ Request.register(baseURL, {
 
 describe('Basic API execution', () => {
   // Ensures that fake server it's running
-  // after(() => ServerInstance.close())
+  after(() => ServerInstance.close())
 
   describe('register method domain', () => {
 
