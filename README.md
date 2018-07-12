@@ -9,7 +9,7 @@ It exports a singleton and trought methods we can register API methods that are 
 
 To use this package is quite simple, after installed you need to import and register the requests with an url
 
-```
+```js
 // Import the package
 import Request from 'request'
 
