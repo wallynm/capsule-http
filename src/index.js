@@ -14,7 +14,7 @@ class Request {
     this.methods = []
   }
   
-  fetch(key, params) {
+  fetch(key, params, returnObject = false) {
     return new Promise((resolve, reject) => {
       const route = this.methods[key]
       const { url, data } = this.replaceDynamicURLParts(route.defaults.url, params)
@@ -29,7 +29,11 @@ class Request {
   
       route()
       .then(result => {
-        resolve(result.data)
+        if(returnObject) {
+          resolve(result)
+        } else {
+          resolve(result.data)
+        }
       }).catch(result => {
         reject(result)
       })
@@ -56,9 +60,6 @@ class Request {
       delete data[nameParam]
       return key
     })
-
-    console.log(url)
-
     return {
       url,
       data
