@@ -10,11 +10,11 @@ It exports a singleton and trought methods we can register API methods that are 
 To use this package is quite simple, after installed you need to import and register the requests with an url
 
 ```js
-// Import the package
+// 1. Import the package
 import Request from 'request'
 
 
-// Register api calls
+// 2. Register api calls
 Request.register("https://yourwebsite.com", {
   get: {
     'fetch.posts': '/posts/:id',
@@ -32,9 +32,11 @@ Request.register("https://yourwebsite.com", {
   }
 })
 
-
-// Execute the request
+// 3. Execute the request
 Request.fetch('fetch.posts')
+
+// 4. Pass parameters with the request
+Request.fetch('fetch.posts', { id: 3 })
 ```
 
 ### Testing
