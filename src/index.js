@@ -1,35 +1,37 @@
 import axios from 'axios'
-import { 
-  PARAMETER_REGEXP, 
-  WILDCARD_REGEXP, 
-  REPLACE_VARIABLE_REGEXP, 
-  REPLACE_WILDCARD, 
-  FOLLOWED_BY_SLASH_REGEXP, 
-  MATCH_REGEXP_FLAGS
-} from './constants'
+import { cacheAdapterEnhancer, throttleAdapterEnhancer } from 'axios-extensions';
 
+const PARAMETER_REGEXP = /([:*])(\w+)/g
 
 class Request {
   constructor() {
     this.methods = []
+    this.http = axios.create({ 
+      adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter, { enabledByDefault: false }))
+    })
   }
+
+  static defaultHeaders = 'test';
   
-  fetch(key, params, returnObject = false) {
+  exec(key, params, options = {}) {
     return new Promise((resolve, reject) => {
-      const route = this.methods[key]
-      const { url, data } = this.replaceDynamicURLParts(route.defaults.url, params)
+      let route = Object.assign({}, this.methods[key])
+      const { url, data } = this.replaceDynamicURLParts(route.url, params)
       
-      route.defaults.url = url
-      
-      if(route.defaults.method === 'get') {
-        route.defaults.params = data
+      // Updates route with new replaced data
+      route.url = url
+
+      if(route.method === 'get') {
+        route.params = data
       } else {
-        route.defaults.data = data
+        route.data = data
       }
-  
-      route()
+
+      route = this.applyHeaders(route, options)
+
+      this.http.request(route)
       .then(result => {
-        if(returnObject) {
+        if(options.debug && options.debug === true) {
           resolve(result)
         } else {
           resolve(result.data)
@@ -38,6 +40,11 @@ class Request {
         reject(result)
       })
     })
+  }
+
+  applyHeaders(route, options) {
+    route.headers = { ...this.defaultHeaders, ...options.headers }
+    return route
   }
 
   register(baseURL, data) {
@@ -53,11 +60,11 @@ class Request {
           throw "This route name already registered"
         }
 
-        this.methods[key] = axios.create({ 
-          url: url,
-          baseURL: baseURL,
-          method
-          })
+        this.methods[key] = {
+          method,
+          url,
+          baseURL
+        }
       }
     }
   }
@@ -65,21 +72,17 @@ class Request {
   replaceDynamicURLParts(url, data) {
     const urlParams = []
     const params = {}
+    
     url = url.replace(PARAMETER_REGEXP, $0 => {
       const nameParam = $0.substring(1)
-      urlParams.push(nameParam)
-      return data[nameParam]
+      const key = data[nameParam]
+      delete data[nameParam]
+      return key
     })
-
-    for (var i in data) {
-      if(!urlParams.indexOf(i)) {
-        params[i] = data[i]
-      }
-    }
 
     return {
       url,
-      params
+      data
     }
   }
 }
