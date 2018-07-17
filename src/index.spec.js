@@ -41,15 +41,10 @@ Capsule.register(baseURL, {
 })
 
 
-
-
-
 describe('Basic API execution', () => {
   after(() => ServerInstance.close())
 
   describe('register method domain', () => {
-
-
     it('should define baseURL', () => {
       expect(() => Capsule.register({get: {'fetch.posts': '/posts/:id'}}) ).to.throw("You must define the first parameter the baseURL.");
     })
@@ -59,59 +54,56 @@ describe('Basic API execution', () => {
     })
   })
 
+  describe('GET method', () => {
+    const stringToBeCached = randString()
 
-describe('GET method', () => {
-  const stringToBeCached = randString()
+    it('should execute with success', async () => {  
+      const result = await Capsule.request('fetch.posts', { id: 1})
+      expect(result).to.include({title: "json-server", id: 1})
+    })
 
-  it('should execute with success', async () => {  
-    const result = await Capsule.request('fetch.posts', { id: 1})
-    expect(result).to.include({title: "json-server", id: 1})
+    it('should return the object data', async () => {  
+      const result = await Capsule.request('fetch.posts', { id: 1})
+      expect(typeof result).to.be.equal('object')
+    })
+
+    it('should execute GET method with success and retrieve data', async () => {  
+      const result = await Capsule.request('fetch.posts', { id: 1})
+      expect(typeof result).to.be.equal('object')
+      expect(result).to.include({title: "json-server", id: 1})
+    })
+
+    it('should return object even using fixed params', async () => {  
+      const result = await Capsule.request('fetch.mongodb.post')
+      expect(typeof result).to.be.equal('object')
+    })
+
+    it('should keep the GET result cached', async () => {
+      const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 300 })
+      await Capsule.request('update.post', { id: 3, title: stringToBeCached })
+      const normalResult = await Capsule.request('fetch.posts', { id: 3 })
+      expect(cachedResult).to.be.equal(normalResult)
+    })
+
+    it('should have same value as first cache GET', async () => {
+      const normalResult = await Capsule.request('fetch.posts', { id: 3 })
+      expect(normalResult.title).to.not.be.equal(stringToBeCached)
+    })
+
+    it('should clean cache correctly with flag "cache" false', async () => {
+      const noCacheResult = await Capsule.request('fetch.posts', { id: 3}, { cache: false })
+      expect(stringToBeCached).to.be.equal(noCacheResult.title)
+    })
+
+    it('should clean cache correctly after defined time', async () => {
+      const newString = randString()
+      const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 0.5, forceUpdate: true })
+      await Capsule.request('update.post', { id: 3, title: newString })
+      await sleep(500)
+      const normalResult = await Capsule.request('fetch.posts', { id: 3 })
+      expect(cachedResult).to.be.not.equal(normalResult)
+    })
   })
-
-  it('should return the object data', async () => {  
-    const result = await Capsule.request('fetch.posts', { id: 1})
-    expect(typeof result).to.be.equal('object')
-  })
-
-  it('should execute GET method with success and retrieve data', async () => {  
-    const result = await Capsule.request('fetch.posts', { id: 1})
-    expect(typeof result).to.be.equal('object')
-    expect(result).to.include({title: "json-server", id: 1})
-  })
-
-  it('should return object even using fixed params', async () => {  
-    const result = await Capsule.request('fetch.mongodb.post')
-    expect(typeof result).to.be.equal('object')
-  })
-
-  it('should keep the GET result cached', async () => {
-    const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 300 })
-    await Capsule.request('update.post', { id: 3, title: stringToBeCached })
-    const normalResult = await Capsule.request('fetch.posts', { id: 3 })
-    expect(cachedResult).to.be.equal(normalResult)
-  })
-
-  it('should have same value as first cache GET', async () => {
-    const normalResult = await Capsule.request('fetch.posts', { id: 3 })
-    expect(normalResult.title).to.not.be.equal(stringToBeCached)
-  })
-
-  it('should clean cache correctly with flag "cache" false', async () => {
-    const noCacheResult = await Capsule.request('fetch.posts', { id: 3}, { cache: false })
-    expect(stringToBeCached).to.be.equal(noCacheResult.title)
-  })
-
-  it('should clean cache correctly after defined time', async () => {
-    const newString = randString()
-    const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 0.5, forceUpdate: true })
-    await Capsule.request('update.post', { id: 3, title: newString })
-    await sleep(500)
-    const normalResult = await Capsule.request('fetch.posts', { id: 3 })
-    expect(cachedResult).to.be.not.equal(normalResult)
-  })
-})
-
-
 
   it('should include all properties', async () => {
     const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
@@ -121,5 +113,5 @@ describe('GET method', () => {
   it('should apply query params correctly', async () => {  
     const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
     expect(result).to.include({title: "json-server"})
-})
+  })
 })
