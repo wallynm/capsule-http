@@ -1,8 +1,4 @@
-### Intro
-This project is a wrapio from axios HTTP client implemeted with better API organizations and also featured with cache support using external package ["axios-extensions"](https://github.com/kuitos/axios-extensions#cacheadapterenhancer)
-
-
-It exports a singleton and trought methods we can register API methods that are accessed later to apply the HTTP requests an treat them.
+This project is a Wrapper of the famous HTTP package - axios. The ideia it's to encapsulate the http requests removing the need to make a new request implementation every time. You design once the methods and call it trough your application just importing the Capsule package, it's also featured with cache support using external package ["axios-extensions"](https://github.com/kuitos/axios-extensions#cacheadapterenhancer)
 
 ### Install
 
@@ -15,7 +11,8 @@ To use this package is quite simple, after installed you need to import and regi
 import Capsule from 'capsule-http'
 
 
-// 2. Register api calls
+// 2. Create a file called API.js and put your server requests there
+// All of your apis will be accessible just importing the capsule-http
 Capsule.register("https://yourwebsite.com", {
   get: {
     'fetch.posts': '/posts/:id',
@@ -33,16 +30,19 @@ Capsule.register("https://yourwebsite.com", {
   }
 })
 
-// 3. Execute the request
+// 3. Into your application services, import the package and execute the request
+import Capsule from 'capsule-http'
 Capsule.request('fetch.posts')
 
-// 4. Pass parameters with the request
+// 4. You can pass parameters with the request
 Capsule.request('fetch.posts', { id: 3 })
 ```
 
-While executing the requests is also an options object, passed after params which you can pass aditional info to the requests like headers, timeout, auth data or any other axios [config specific](https://github.com/axios/axios#request-config)
+You can also pass an options parameter, which you can pass info like headers, timeout, auth data or any other axios [config specific](https://github.com/axios/axios#request-config)
 
-There's olny two configs that are not listed into axios that's caching data, this wrapper come with axios-extension cache adapter to handle cache requests, to take advantage of just pass the time in seconds of the cache as option parameter:
+There's two configs that are not listed into axios. 
+
+1. Caching data, this wrapper come with axios-extension cache adapter to handle cache requests, to take advantage of just pass the time in seconds of the cache as option parameter:
 ```js
 // If you want, you can also set a cache handler to optimize requests (ex: 10 minutes)
 Capsule.request('fetch.posts', { id: 3 }, { cache: 600 })

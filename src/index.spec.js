@@ -55,8 +55,6 @@ describe('Basic API execution', () => {
   })
 
   describe('GET method', () => {
-    const stringToBeCached = randString()
-
     it('should execute with success', async () => {  
       const result = await Capsule.request('fetch.posts', { id: 1})
       expect(result).to.include({title: "json-server", id: 1})
@@ -77,6 +75,20 @@ describe('Basic API execution', () => {
       const result = await Capsule.request('fetch.mongodb.post')
       expect(typeof result).to.be.equal('object')
     })
+
+    it('should include all properties', async () => {
+      const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
+      expect(result).to.include({title: "json-server"})
+    })
+
+    it('should apply query params correctly', async () => {  
+      const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
+      expect(result).to.include({title: "json-server"})
+    })
+  })
+
+  describe('Caching data', () => {
+    const stringToBeCached = randString()
 
     it('should keep the GET result cached', async () => {
       const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 300 })
@@ -103,15 +115,5 @@ describe('Basic API execution', () => {
       const normalResult = await Capsule.request('fetch.posts', { id: 3 })
       expect(cachedResult).to.be.not.equal(normalResult)
     })
-  })
-
-  it('should include all properties', async () => {
-    const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
-    expect(result).to.include({title: "json-server"})
-  })
-
-  it('should apply query params correctly', async () => {  
-    const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
-    expect(result).to.include({title: "json-server"})
   })
 })
