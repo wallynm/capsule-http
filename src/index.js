@@ -67,7 +67,7 @@ class Capsule {
         const SH_GREEN = "\x1b[32m"
         const SH_RESET = "\x1b[0m"
         const message = `[${method.toUpperCase()}] ${key} -> ${baseURL + url}`
-        if(isNode) {
+        if(this.isNode) {
           console.log(SH_GREEN, message, SH_RESET)
         } else {
           console.log(message)
