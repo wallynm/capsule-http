@@ -48,6 +48,21 @@ describe('Basic API execution', () => {
     it('should define baseURL', () => {
       expect(() => Capsule.register({get: {'fetch.posts': '/posts/:id'}}) ).to.throw("You must define the first parameter the baseURL.");
     })
+
+    it('should allow register objects params', () => {
+      Capsule.register(baseURL, {
+        get: {
+          'fetch.object.register': {
+            url: '/posts/:id',
+            data: { id: 2 }
+          }
+        }
+      })
+
+      expect(Capsule.methods['fetch.object.register']).to.exist
+      expect(Capsule.methods['fetch.object.register'].defaults.url).to.be.equal('/posts/:id')
+      expect(Capsule.methods['fetch.object.register'].defaults.data.id).to.be.equal(2)
+    })
     
     it('shouldn\'t allow duplicated key names', () => {
       expect(() => Capsule.register(baseURL, {get: {'fetch.posts': '/posts/:id'}}) ).to.throw("This route name already registered");
@@ -109,9 +124,9 @@ describe('Basic API execution', () => {
 
     it('should clean cache correctly after defined time', async () => {
       const newString = randString()
-      const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 0.5, forceUpdate: true })
+      const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 0.1, forceUpdate: true })
       await Capsule.request('update.post', { id: 3, title: newString })
-      await sleep(500)
+      await sleep(100)
       const normalResult = await Capsule.request('fetch.posts', { id: 3 })
       expect(cachedResult).to.be.not.equal(normalResult)
     })

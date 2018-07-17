@@ -1,6 +1,6 @@
 {
   "name": "capsule-http",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "dist/index.js",
   "scripts": {
     "test": "mocha -R spec --require babel-register src/index.spec.js",

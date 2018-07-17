@@ -10,8 +10,12 @@ class Capsule {
     this.methods = []
   }
 
-  static defaultHeaders = {
-    headers: { 'Cache-Control': 'no-cache' }
+  defaultHeaders = {
+    'Cache-Control': 'no-cache'
+  }
+
+  addHeader(headers) {
+    this.defaultHeaders = { ...this.defaultHeaders, ...headers }
   }
   
   cache(seconds = DEFAULT_FIVE_MINUTES) {
@@ -27,7 +31,7 @@ class Capsule {
       if(CACHE_REGISTER || CACHE_UPDATE) {
         this.methods[key].defaults.cache = this.cache(options.cache)
 
-        //
+        // If cache it's marked as false we need to remove it as the axios will resolve the request itself
         if(options.cache !== false) {
           delete options.cache
         }
@@ -39,7 +43,8 @@ class Capsule {
 
 
       options.url = url
-      options.headers = { ...this.defaultHeaders, ...options.headers }
+      this.addHeader(options.headers)
+      options.headers = this.defaultHeaders
   
       if(route.method === 'get') {
         options.params = data
@@ -49,6 +54,7 @@ class Capsule {
 
       route.request(options)
       .then(result => {
+        // console.info(result)
         if(options.debug && options.debug === true) {
           resolve(result)
         } else {
@@ -67,15 +73,22 @@ class Capsule {
 
     for(let method in data) {
       for(let key in data[method] ) {
-        const url = data[method][key]
+        const methodData = data[method][key]
+
+        // Treating url as always an object we open the register method to be treated very open
+        let options = (typeof methodData === 'object') ? methodData : { url: methodData }
 
         if(typeof this.methods[key] !== 'undefined') {
           throw "This route name already registered"
         }
 
+        if(options.cache) {
+          options.cache = this.cache(options.cache)
+        }
+
         this.methods[key] = axios.create({
+          ...options,
           method,
-          url,
           baseURL,
           cache: false,
           adapter: cacheAdapterEnhancer(axios.defaults.adapter, { enabledByDefault: false })

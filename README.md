@@ -9,13 +9,11 @@ The idea is to encapsulate the HTTP call making it easier to implement the reque
 To use this package is quite simple, after installed you need to import and register the requests with an url
 
 ```js
-// 1. Import the package
 import Capsule from 'capsule-http'
 
-
-// 2. Create a file called API.js and put your server requests there
+// Create a file called API.js and put your server requests there
 // All of your apis will be accessible just importing the capsule-http
-Capsule.register("https://yourwebsite.com", {
+Capsule.register("https://your-global-endpoint", {
   get: {
     'fetch.posts': '/posts/:id',
     'fetch.post': '/post',
@@ -31,8 +29,27 @@ Capsule.register("https://yourwebsite.com", {
     'remove.post': '/posts/:id'
   }
 })
+```
 
-// 3. Into your application services, import the package and execute the request
+You can also use the register to define any object property as cache, just passing an object instead of the url:
+```js
+import Capsule from 'capsule-http'
+
+Capsule.register("https://your-global-endpoint", {
+  get: {
+    'fetch.posts': {
+      url: '/posts/:id',
+      cache: 300
+    },
+    'fetch.post': '/post',
+    'fetch.mongodb.post': '/posts/3',
+  }
+})
+```
+
+
+Into your application services, import the package and execute the request
+```js
 import Capsule from 'capsule-http'
 Capsule.request('fetch.posts')
 
