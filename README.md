@@ -1,3 +1,10 @@
+Capsule HTTP - 
+
+
+Capsule HTTP: 
+![alt text](https://raw.githubusercontent.com/wallynm/capsule-http/master/capsule-corp-pegatina-dragon-ball.png "Capsule HTTP - Capsule Corp")
+
+
 This project is a Wrapper of the famous HTTP package - axios. The ideia it's to encapsulate the http requests removing the need to make a new request implementation every time. You design once the methods and call it trough your application just importing the Capsule package, it's also featured with cache support using external package ["axios-extensions"](https://github.com/kuitos/axios-extensions#cacheadapterenhancer)
 
 ### Install
