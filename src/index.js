@@ -60,8 +60,8 @@ class Capsule {
 
       if (this.debug === true) {
         const FgGreen = "\x1b[32m"
-        const { method, baseURL, url } = route.defaults
-        console.log(FgGreen, `[${method.toUpperCase()}] ${key} > ${baseURL + url}`)
+        const { method, baseURL } = route.defaults
+        console.log(FgGreen, `[${method.toUpperCase()}] ${key} -> ${baseURL + url}`)
       }
 
       route.request(options)
