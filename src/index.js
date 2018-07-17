@@ -15,6 +15,10 @@ class Capsule {
   }
 
   debug = false
+
+  get isNode () {
+    return typeof global !== "undefined" && ({}).toString.call(global) === '[object global]';
+  }
   
   enableDebug() {
     this.debug = true
@@ -59,9 +63,15 @@ class Capsule {
       }
 
       if (this.debug === true) {
-        const FgGreen = "\x1b[32m"
         const { method, baseURL } = route.defaults
-        console.log(FgGreen, `[${method.toUpperCase()}] ${key} -> ${baseURL + url}`)
+        const SH_GREEN = "\x1b[32m"
+        const SH_RESET = "\x1b[0m"
+        const message = `[${method.toUpperCase()}] ${key} -> ${baseURL + url}`
+        if(isNode) {
+          console.log(SH_GREEN, message, SH_RESET)
+        } else {
+          console.log(message)
+        }
       }
 
       route.request(options)
