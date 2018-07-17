@@ -2,7 +2,7 @@
     "env": {
         "es6": true
     },
-    "extends": ["eslint:recommended"],
+    "extends": ["eslint:recommended", "airbnb"],
     "rules": {
         "indent": [
             "error",
