@@ -22,7 +22,7 @@ class Capsule {
   
   log(message, type = 'success') {
     const SHRESET = "\x1b[0m"
-    const types = {
+    const color = {
       error: "\x1b[31m",
       warning: "\x1b[33m",
       success: "\x1b[32m"
