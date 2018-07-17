@@ -3,6 +3,7 @@ import { cacheAdapterEnhancer, Cache } from 'axios-extensions'
 
 const PARAMETER_REGEXP = /([:*])(\w+)/g
 const DEFAULT_FIVE_MINUTES = 5000
+const SHCOLORS = 
 
 class Capsule {
   constructor() {
@@ -20,6 +21,21 @@ class Capsule {
     return typeof global !== "undefined" && ({}).toString.call(global) === '[object global]';
   }
   
+  log(message, type = 'success') {
+    const SHRESET = "\x1b[0m"
+    const types = {
+      error: "\x1b[31m",
+      warning: "\x1b[33m",
+      success: "\x1b[32m"
+    }
+
+    if (this.isNode) {
+      console.log(color[type], message, SHRESET)
+    } else {
+      console.log(message)
+    }
+  }
+
   enableDebug() {
     this.debug = true
   }
@@ -64,14 +80,7 @@ class Capsule {
 
       if (this.debug === true) {
         const { method, baseURL } = route.defaults
-        const SH_GREEN = "\x1b[32m"
-        const SH_RESET = "\x1b[0m"
-        const message = `[${method.toUpperCase()}] ${key} -> ${baseURL + url}`
-        if(this.isNode) {
-          console.log(SH_GREEN, message, SH_RESET)
-        } else {
-          console.log(message)
-        }
+        this.log(`[${method.toUpperCase()}] ${key} -> ${baseURL + url}`)
       }
 
       route.request(options)
@@ -83,6 +92,12 @@ class Capsule {
           resolve(result.data)
         }
       }).catch(result => {
+
+        if (this.debug === true) {
+          const { method, baseURL } = route.defaults
+          this.log(`[${method.toUpperCase()}] ${key} -> ${baseURL + url}`, 'error')
+        }
+        
         reject(result)
       })
     })
