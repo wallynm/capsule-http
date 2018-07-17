@@ -3,7 +3,6 @@ import { cacheAdapterEnhancer, Cache } from 'axios-extensions'
 
 const PARAMETER_REGEXP = /([:*])(\w+)/g
 const DEFAULT_FIVE_MINUTES = 5000
-const SHCOLORS = 
 
 class Capsule {
   constructor() {
