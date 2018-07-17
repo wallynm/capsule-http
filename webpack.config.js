@@ -1,8 +1,8 @@
+var merge = require('webpack-merge')
+const outputPath = __dirname + '/dist'
 
-module.exports = {
-  entry: [
-    './src/index.js'
-  ],
+const common = {
+  entry: './src/index.js',
   module: {
     rules: [
       {
@@ -14,9 +14,25 @@ module.exports = {
   },
   resolve: {
     extensions: ['*', '.js', '.jsx']
-  },
+  }
+}
+
+
+const serverConfig = merge(common, {
+  target: 'node',
   output: {
-    path: __dirname + '/dist',
+    libraryTarget: 'commonjs2',
+    path: outputPath,
+    filename: 'index.node.js'
+  }
+})
+
+const clientConfig = merge(common, {
+  target: 'web', // <=== can be omitted as default is 'web'
+  output: {
+    path: outputPath,
     filename: 'index.js'
   }
-};
+})
+
+module.exports = [serverConfig, clientConfig]

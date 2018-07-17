@@ -1,7 +1,8 @@
 {
   "name": "capsule-http",
-  "version": "1.0.5",
-  "main": "dist/index.js",
+  "version": "1.0.6",
+  "main": "dist/index.node.js",
+  "browser": "dist/index.js",
   "scripts": {
     "test": "mocha -R spec --require babel-register src/index.spec.js",
     "pretest": "npm run build",
@@ -19,7 +20,8 @@
     "json-server": "^0.14.0",
     "mocha": "^5.2.0",
     "webpack": "^4.16.0",
-    "webpack-cli": "^3.0.8"
+    "webpack-cli": "^3.0.8",
+    "webpack-merge": "^4.1.3"
   },
   "dependencies": {
     "axios": "^0.18.0",

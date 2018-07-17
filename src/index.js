@@ -14,6 +14,12 @@ class Capsule {
     'Cache-Control': 'no-cache'
   }
 
+  debug = false
+  
+  enableDebug() {
+    this.debug = true
+  }
+
   addHeader(headers) {
     this.defaultHeaders = { ...this.defaultHeaders, ...headers }
   }
@@ -52,10 +58,15 @@ class Capsule {
         options.data = data
       }
 
+      if (this.debug) {
+        const { method, baseURL, url } = route.defaults
+        console.info(`[${method}] ${key} > ${baseURL + url}`)
+      }
+
       route.request(options)
       .then(result => {
         // console.info(result)
-        if(options.debug && options.debug === true) {
+        if(options.fullResult && options.fullResult === true) {
           resolve(result)
         } else {
           resolve(result.data)
@@ -114,4 +125,4 @@ class Capsule {
   }
 }
 
-export default new Capsule()
+module.exports = new Capsule()
