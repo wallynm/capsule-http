@@ -1,11 +1,12 @@
 {
   "name": "capsule-http",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "dist/index.node.js",
   "browser": "dist/index.js",
   "scripts": {
     "test": "mocha -R spec --require babel-register src/index.spec.js",
     "pretest": "npm run build",
+    "prepublish": "npm run test",
     "build": "webpack --mode development"
   },
   "author": "wally.nm@gmail.com",

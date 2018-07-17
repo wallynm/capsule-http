@@ -40,7 +40,6 @@ Capsule.register(baseURL, {
   }
 })
 
-
 describe('Basic API execution', () => {
   after(() => ServerInstance.close())
 
