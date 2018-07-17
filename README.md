@@ -1,6 +1,6 @@
 ![Capsule HTTP](https://raw.githubusercontent.com/wallynm/capsule-http/master/capsule-corp-pegatina-dragon-ball.png "Capsule HTTP")
 
-The idea is to encapsulate the HTTP call making it easier to implement the requests by removing the need for duplicate settings. The methods are designed once all through the application and are fully accessible through the Capsule package. Another feature is that it has already been implemented with requests caching using the external "axios-extensions" ["axios-extensions"](https://github.com/kuitos/axios-extensions#cacheadapterenhancer) package.
+The idea is to encapsulate the HTTP call making it easier to implement the requests by removing the need for duplicate settings. The methods are designed once all through the application and are fully accessible through the Capsule package. Another feature is that it has already been implemented with requests caching using the external ["axios-extensions"](https://github.com/kuitos/axios-extensions#cacheadapterenhancer) package.
 
 ### Install
 
