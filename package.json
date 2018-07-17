@@ -1,5 +1,5 @@
 {
-  "name": "request",
+  "name": "capsule-http",
   "version": "1.0.2",
   "main": "index.js",
   "scripts": {

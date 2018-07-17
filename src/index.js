@@ -1,35 +1,53 @@
 import axios from 'axios'
-import { cacheAdapterEnhancer, throttleAdapterEnhancer } from 'axios-extensions';
+import { cacheAdapterEnhancer, Cache } from 'axios-extensions'
 
 const PARAMETER_REGEXP = /([:*])(\w+)/g
+const DEFAULT_FIVE_MINUTES = 5000
 
-class Request {
+class Capsule {
   constructor() {
+    this.req = this.request.bind(this, true)
     this.methods = []
-    this.http = axios.create({ 
-      adapter: throttleAdapterEnhancer(cacheAdapterEnhancer(axios.defaults.adapter, { enabledByDefault: false }))
-    })
   }
 
-  static defaultHeaders = 'test';
+  static defaultHeaders = {
+    headers: { 'Cache-Control': 'no-cache' }
+  }
   
-  exec(key, params, options = {}) {
-    return new Promise((resolve, reject) => {
-      let route = Object.assign({}, this.methods[key])
-      const { url, data } = this.replaceDynamicURLParts(route.url, params)
-      
-      // Updates route with new replaced data
-      route.url = url
+  cache(seconds = DEFAULT_FIVE_MINUTES) {
+    return new Cache({ maxAge: seconds * 1000, max: 100 })
+  }
 
+  request(key, params, options = {}) {
+    return new Promise((resolve, reject) => {
+      const CACHE_REGISTER = !this.methods[key].defaults.cache && options.cache
+      const CACHE_UPDATE = this.methods[key].defaults.cache && options.forceUpdate
+      
+      // Configure a timing based on the input passed / default 5 mins
+      if(CACHE_REGISTER || CACHE_UPDATE) {
+        this.methods[key].defaults.cache = this.cache(options.cache)
+
+        //
+        if(options.cache !== false) {
+          delete options.cache
+        }
+      }
+  
+      // Before get route object we update it's cache
+      let route = Object.assign({}, this.methods[key])
+      const { url, data } = this.replaceDynamicURLParts(route.defaults.url, params)
+
+
+      options.url = url
+      options.headers = { ...this.defaultHeaders, ...options.headers }
+  
       if(route.method === 'get') {
-        route.params = data
+        options.params = data
       } else {
-        route.data = data
+        options.data = data
       }
 
-      route = this.applyHeaders(route, options)
-
-      this.http.request(route)
+      route.request(options)
       .then(result => {
         if(options.debug && options.debug === true) {
           resolve(result)
@@ -40,11 +58,6 @@ class Request {
         reject(result)
       })
     })
-  }
-
-  applyHeaders(route, options) {
-    route.headers = { ...this.defaultHeaders, ...options.headers }
-    return route
   }
 
   register(baseURL, data) {
@@ -60,18 +73,19 @@ class Request {
           throw "This route name already registered"
         }
 
-        this.methods[key] = {
+        this.methods[key] = axios.create({
           method,
           url,
-          baseURL
-        }
+          baseURL,
+          cache: false,
+          adapter: cacheAdapterEnhancer(axios.defaults.adapter, { enabledByDefault: false })
+        })
       }
     }
   }
   
-  replaceDynamicURLParts(url, data) {
-    const urlParams = []
-    const params = {}
+  replaceDynamicURLParts(url, params) {
+    let data = Object.assign({}, params)
     
     url = url.replace(PARAMETER_REGEXP, $0 => {
       const nameParam = $0.substring(1)
@@ -87,4 +101,4 @@ class Request {
   }
 }
 
-export default new Request()
+export default new Capsule()
