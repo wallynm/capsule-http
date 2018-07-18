@@ -84,20 +84,27 @@ class Capsule {
 
       route.request(options)
       .then(result => {
-        // console.info(result)
-        if(options.fullResult && options.fullResult === true) {
-          resolve(result)
-        } else {
-          resolve(result.data)
+
+        if(!this.isNode) {
+          console.log(result)
         }
-      }).catch(result => {
+        const data = (options.fullResult && options.fullResult === true) ? result : result.data
+        resolve(data)
+      }).catch(error => {
+        let data = (options.fullResult && options.fullResult === true) ? error : error.response.data
+
+        if(!this.isNode) {
+          data = {
+            code: error.response.status,
+            message: error.response.statusText
+          }
+        }
 
         if (this.debug === true) {
           const { method, baseURL } = route.defaults
-          this.log(`[${method.toUpperCase()}] ${key} -> ${baseURL + url}`, 'error')
+          this.log(`[${method.toUpperCase()}] ${data.code} ${key} -> ${baseURL + url}`, 'error')
         }
-        
-        reject(result)
+        resolve(data)
       })
     })
   }
@@ -115,7 +122,7 @@ class Capsule {
         let options = (typeof methodData === 'object') ? methodData : { url: methodData }
 
         if(typeof this.methods[key] !== 'undefined') {
-          throw "This route name already registered"
+          throw `The route ${key} already registered`
         }
 
         if(options.cache) {

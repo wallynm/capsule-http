@@ -28,9 +28,10 @@ const serverConfig = merge(common, {
 })
 
 const clientConfig = merge(common, {
-  target: 'web', // <=== can be omitted as default is 'web'
   output: {
     path: outputPath,
+    libraryTarget: 'umd',
+    globalObject: 'this',
     filename: 'index.js'
   }
 })

@@ -64,7 +64,7 @@ describe('Basic API execution', () => {
     })
     
     it('shouldn\'t allow duplicated key names', () => {
-      expect(() => Capsule.register(baseURL, {get: {'fetch.posts': '/posts/:id'}}) ).to.throw("This route name already registered");
+      expect(() => Capsule.register(baseURL, {get: {'fetch.posts': '/posts/:id'}}) ).to.throw("The route fetch.posts already registered");
     })
   })
 
