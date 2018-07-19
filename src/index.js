@@ -54,6 +54,7 @@ class Capsule {
       
       // Configure a timing based on the input passed / default 5 mins
       if(CACHE_REGISTER || CACHE_UPDATE) {
+
         this.methods[key].defaults.cache = this.cache(options.cache)
 
         // If cache it's marked as false we need to remove it as the axios will resolve the request itself
@@ -112,7 +113,7 @@ class Capsule {
 
     console.info(baseURL)
     if(!baseURL || typeof baseURL !== "string") {
-      console.error("You must define the first parameter the baseURL.")
+      return console.error("You must define the first parameter the baseURL.")
     }
 
     for(let method in data) {
@@ -123,18 +124,19 @@ class Capsule {
         let options = (typeof methodData === 'object') ? methodData : { url: methodData }
 
         if(typeof this.methods[key] !== 'undefined') {
-          console.error(`The route ${key} already registered`)
+          return console.error(`The route ${key} already registered`)
         }
 
         if(options.cache) {
           options.cache = this.cache(options.cache)
+        } else {
+          options.cache = false
         }
 
         this.methods[key] = axios.create({
           ...options,
           method,
           baseURL,
-          cache: false,
           adapter: cacheAdapterEnhancer(axios.defaults.adapter, { enabledByDefault: false })
         })
       }
