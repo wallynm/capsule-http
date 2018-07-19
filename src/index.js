@@ -66,7 +66,6 @@ class Capsule {
       let route = Object.assign({}, this.methods[key])
       const { url, data } = this.replaceDynamicURLParts(route.defaults.url, params)
 
-
       options.url = url
       this.addHeader(options.headers)
       options.headers = this.defaultHeaders
@@ -110,8 +109,10 @@ class Capsule {
   }
 
   register(baseURL, data) {
+
+    console.info(baseURL)
     if(!baseURL || typeof baseURL !== "string") {
-      throw "You must define the first parameter the baseURL."
+      console.error("You must define the first parameter the baseURL.")
     }
 
     for(let method in data) {
@@ -122,7 +123,7 @@ class Capsule {
         let options = (typeof methodData === 'object') ? methodData : { url: methodData }
 
         if(typeof this.methods[key] !== 'undefined') {
-          throw `The route ${key} already registered`
+          console.error(`The route ${key} already registered`)
         }
 
         if(options.cache) {

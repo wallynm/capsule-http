@@ -21,9 +21,11 @@ const common = {
 const serverConfig = merge(common, {
   target: 'node',
   output: {
-    libraryTarget: 'commonjs2',
     path: outputPath,
-    filename: 'index.node.js'
+    filename: 'index.node.js',
+    libraryTarget: 'umd',
+    umdNamedDefine: true,
+    globalObject: 'this'
   }
 })
 
