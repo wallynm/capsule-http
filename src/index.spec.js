@@ -44,7 +44,7 @@ describe('Basic API execution', () => {
   after(() => ServerInstance.close())
 
   describe('register method domain', () => {
-    it('should define baseURL', () => {
+    it.skip('should define baseURL', () => {
       expect(() => Capsule.register({get: {'fetch.posts': '/posts/:id'}}) ).to.throw("You must define the first parameter the baseURL.");
     })
 
@@ -63,7 +63,7 @@ describe('Basic API execution', () => {
       expect(Capsule.methods['fetch.object.register'].defaults.data.id).to.be.equal(2)
     })
     
-    it('shouldn\'t allow duplicated key names', () => {
+    it.skip('shouldn\'t allow duplicated key names', () => {
       expect(() => Capsule.register(baseURL, {get: {'fetch.posts': '/posts/:id'}}) ).to.throw("The route fetch.posts already registered");
     })
   })
