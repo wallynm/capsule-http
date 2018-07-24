@@ -48,6 +48,10 @@ class Capsule {
   }
 
   request(key, params, options = {}) {
+    if (!this.methods[key]) {
+      console.error(`The route ${key} was not defined.`)
+    }
+
     return new Promise((resolve, reject) => {
       const CACHE_REGISTER = !this.methods[key].defaults.cache && options.cache
       const CACHE_UPDATE = this.methods[key].defaults.cache && options.forceUpdate
@@ -65,16 +69,15 @@ class Capsule {
   
       // Before get route object we update it's cache
       let route = Object.assign({}, this.methods[key])
-      const { url, data } = this.replaceDynamicURLParts(route.defaults.url, params)
+      options.url = this.replaceDynamicURLParts(route.defaults.url, params)
 
-      options.url = url
       this.addHeader(options.headers)
       options.headers = this.defaultHeaders
   
       if(route.method === 'get') {
-        options.params = data
+        options.params = params
       } else {
-        options.data = data
+        options.data = params
       }
 
       if (this.debug === true) {
@@ -110,8 +113,6 @@ class Capsule {
   }
 
   register(baseURL, data) {
-
-    console.info(baseURL)
     if(!baseURL || typeof baseURL !== "string") {
       return console.error("You must define the first parameter the baseURL.")
     }
@@ -144,19 +145,10 @@ class Capsule {
   }
   
   replaceDynamicURLParts(url, params) {
-    let data = Object.assign({}, params)
-    
-    url = url.replace(PARAMETER_REGEXP, $0 => {
+    return url.replace(PARAMETER_REGEXP, $0 => {
       const nameParam = $0.substring(1)
-      const key = data[nameParam]
-      delete data[nameParam]
-      return key
+      return params[nameParam]
     })
-
-    return {
-      url,
-      data
-    }
   }
 }
 
