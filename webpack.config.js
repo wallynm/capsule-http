@@ -2,6 +2,7 @@ var merge = require('webpack-merge')
 const outputPath = __dirname + '/dist'
 
 const common = {
+  devtool: 'source-map',
   entry: './src/index.js',
   module: {
     rules: [

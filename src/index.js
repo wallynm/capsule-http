@@ -82,7 +82,7 @@ class Capsule {
 
       if (this.debug === true) {
         const { method, baseURL } = route.defaults
-        this.log(`[${method.toUpperCase()}] ${key} -> ${baseURL + url}`)
+        this.log(`[${method.toUpperCase()}] ${key} -> ${ baseURL + options.url }`)
       }
 
       route.request(options)
@@ -105,7 +105,7 @@ class Capsule {
 
         if (this.debug === true) {
           const { method, baseURL } = route.defaults
-          this.log(`[${method.toUpperCase()}] ${data.code} ${key} -> ${baseURL + url}`, 'error')
+          this.log(`[${method.toUpperCase()}] ${data.code} ${key} -> ${baseURL + options.url}`, 'error')
         }
         resolve(data)
       })
