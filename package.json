@@ -1,6 +1,6 @@
 {
   "name": "capsule-http",
-  "version": "1.0.19",
+  "version": "1.0.21",
   "main": "dist/index.node.js",
   "browser": "dist/index.js",
   "scripts": {
