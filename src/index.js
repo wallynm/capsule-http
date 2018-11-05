@@ -87,16 +87,20 @@ class Capsule {
 
       route.request(options)
       .then(result => {
-
-        if(!this.isNode) {
-          console.log(result)
-        }
         const data = (options.fullResult && options.fullResult === true) ? result : result.data
         resolve(data)
       }).catch(error => {
-        let data = (options.fullResult && options.fullResult === true) ? error : error.response.data
+        let data = {}
 
-        if(!this.isNode) {
+        if(this.isNode) {
+          data = error.response && error.response.data
+          if(error.code) {
+            data = {
+              code: error.errno,
+              message: error.code
+            }
+          }
+        } else {
           data = {
             code: error.response.status,
             message: error.response.statusText
@@ -107,6 +111,7 @@ class Capsule {
           const { method, baseURL } = route.defaults
           this.log(`[${method.toUpperCase()}] ${data.code} ${key} -> ${baseURL + options.url}`, 'error')
         }
+
         resolve(data)
       })
     })
@@ -153,3 +158,4 @@ class Capsule {
 }
 
 module.exports = new Capsule()
+module.exports.axios = axios
