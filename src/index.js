@@ -8,6 +8,7 @@ class Capsule {
   constructor() {
     this.req = this.request.bind(this, true)
     this.methods = []
+    this.axios = axios
   }
 
   defaultHeaders = {
@@ -158,4 +159,3 @@ class Capsule {
 }
 
 module.exports = new Capsule()
-module.exports.axios = axios
