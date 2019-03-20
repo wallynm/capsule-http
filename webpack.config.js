@@ -1,7 +1,10 @@
 var merge = require('webpack-merge')
+const TerserPlugin = require('terser-webpack-plugin');
+
 const outputPath = __dirname + '/dist'
 
 const common = {
+  mode: 'production',
   devtool: 'source-map',
   entry: './src/index.js',
   module: {
@@ -15,6 +18,9 @@ const common = {
   },
   resolve: {
     extensions: ['*', '.js', '.jsx']
+  },
+  optimization: {
+    minimizer: [new TerserPlugin()],
   }
 }
 
