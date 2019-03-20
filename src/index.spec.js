@@ -1,4 +1,5 @@
-import "regenerator-runtime/runtime";
+require('@babel/register')
+
 import Capsule from './index'
 const jsonServer = require('json-server')
 const chai = require('chai')
