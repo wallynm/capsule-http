@@ -1,6 +1,5 @@
-require('@babel/register')
+const Capsule = require('.')
 
-import Capsule from './index'
 const jsonServer = require('json-server')
 const chai = require('chai')
 const should = chai.should()
