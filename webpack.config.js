@@ -1,7 +1,7 @@
 var merge = require('webpack-merge')
 const TerserPlugin = require('terser-webpack-plugin');
 
-const outputPath = __dirname + '/dist'
+const outputPath = __dirname + '/.dist'
 
 const common = {
   mode: 'production',
