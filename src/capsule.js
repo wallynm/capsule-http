@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios/index'
 import { cacheAdapterEnhancer, Cache } from 'axios-extensions'
 
 const PARAMETER_REGEXP = /([:*])(\w+)/g
@@ -8,13 +8,12 @@ class Capsule {
   constructor() {
     this.req = this.request.bind(this, true)
     this.methods = []
+    this.debug = false
+    this.http = axios
+    this.defaultHeaders = {
+      'Cache-Control': 'no-cache'
+    }
   }
-
-  defaultHeaders = {
-    'Cache-Control': 'no-cache'
-  }
-
-  debug = false
 
   get isNode () {
     return typeof global !== "undefined" && ({}).toString.call(global) === '[object global]';
@@ -49,7 +48,7 @@ class Capsule {
 
   request(key, params, options = {}) {
     if (!this.methods[key]) {
-      console.error(`The route ${key} was not defined.`)
+      return console.error(`The route ${key} was not defined.`)
     }
 
     return new Promise((resolve, reject) => {
@@ -157,5 +156,4 @@ class Capsule {
   }
 }
 
-module.exports = new Capsule()
-module.exports.axios = axios
+export default new Capsule()
