@@ -38,8 +38,17 @@ class Capsule {
     this.debug = true
   }
 
-  addHeader(headers) {
-    this.defaultHeaders = { ...this.defaultHeaders, ...headers }
+
+  addHeader(headers = {}) {
+    for (const [headerKey, value] of Object.entries(headers)) {
+      const parsedValue = (typeof value === 'function') ? value() : value;
+      headers[headerKey] = parsedValue;
+    }
+
+    this.defaultHeaders = {
+      ...this.defaultHeaders,
+      ...headers
+    };
   }
   
   cache(seconds = DEFAULT_FIVE_MINUTES) {
@@ -117,7 +126,7 @@ class Capsule {
   }
 
   register(baseURL, data) {
-    if(!baseURL || typeof baseURL !== "string") {
+    if(typeof baseURL !== "string") {
       return console.error("You must define the first parameter the baseURL.")
     }
 
