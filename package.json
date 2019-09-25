@@ -1,11 +1,11 @@
 {
   "name": "capsule-http",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "main": "dist/capsule-http.cjs.js",
   "browser": "dist/capsule-http.esm.js",
   "module": "dist/capsule-http.umd.js",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.18.0",
     "axios-extensions": "^3.0.3"
   },
   "devDependencies": {
