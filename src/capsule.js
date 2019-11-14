@@ -3,6 +3,8 @@ import { cacheAdapterEnhancer, Cache } from 'axios-extensions'
 
 const PARAMETER_REGEXP = /([:*])(\w+)/g
 const DEFAULT_FIVE_MINUTES = 5000
+const CancelToken = axios.CancelToken.source()
+
 
 class Capsule {
   constructor() {
@@ -57,6 +59,10 @@ class Capsule {
   
   cache(seconds = DEFAULT_FIVE_MINUTES) {
     return new Cache({ maxAge: seconds * 1000, max: 100 })
+  }
+
+  cancelRequests(message) {
+    CancelToken.cancel(message);
   }
 
   request(key, params, options = {}) {
@@ -156,6 +162,7 @@ class Capsule {
 
         this.methods[key] = axios.create({
           ...options,
+          cancelToken: CancelToken.token,
           method,
           baseURL,
           adapter: cacheAdapterEnhancer(axios.defaults.adapter, { enabledByDefault: false })
