@@ -13,6 +13,7 @@ class Capsule {
     this.defaultHeaders = {
       'Cache-Control': 'no-cache'
     }
+    this.errorHandler = null;
   }
 
   get isNode () {
@@ -38,6 +39,9 @@ class Capsule {
     this.debug = true
   }
 
+  globalErrorHandler(method) {
+    this.errorHandler = method
+  }
 
   addHeader(headers = {}) {
     for (const [headerKey, value] of Object.entries(headers)) {
@@ -101,18 +105,21 @@ class Capsule {
         let data = {}
 
         if(this.isNode) {
-          data = error.response && error.response.data
+          data = error.response && error.response.data;
           if(error.code) {
-            data = {
-              code: error.errno,
-              message: error.code
-            }
+            data.code = error.errno;
+            data.message = error.code;
           }
         } else {
-          data = {
-            code: error.response.status,
-            message: error.response.statusText
-          }
+          data.code = error.response.status;
+          data.message = error.response.statusText
+        }
+
+        if(typeof this.errorHandler === 'function') {
+          this.errorHandler({
+            ...data,
+            url: options.url
+          })
         }
 
         if (this.debug === true) {
