@@ -1,10 +1,7 @@
 import axios from 'axios/index'
-import { cacheAdapterEnhancer, Cache } from 'axios-extensions'
 
 const PARAMETER_REGEXP = /([:*])(\w+)/g
 const DEFAULT_FIVE_MINUTES = 5000
-const CancelToken = axios.CancelToken.source()
-
 
 class Capsule {
   constructor() {
@@ -12,17 +9,19 @@ class Capsule {
     this.methods = []
     this.debug = false
     this.http = axios
-    this.defaultHeaders = {
-      'Cache-Control': 'no-cache'
-    }
-    this.errorHandler = null;
+    this.errorHandler = null
+    this.defaultHeaders = {}
   }
 
   get isNode () {
-    return typeof global !== "undefined" && ({}).toString.call(global) === '[object global]';
+    return typeof global !== "undefined" && ({}).toString.call(global) === '[object global]'
   }
   
   log(message, type = 'success') {
+    if(this.debug !== true) {
+      return null
+    }
+
     const SHRESET = "\x1b[0m"
     const color = {
       error: "\x1b[31m",
@@ -47,22 +46,14 @@ class Capsule {
 
   addHeader(headers = {}) {
     for (const [headerKey, value] of Object.entries(headers)) {
-      const parsedValue = (typeof value === 'function') ? value() : value;
-      headers[headerKey] = parsedValue;
+      const parsedValue = (typeof value === 'function') ? value() : value
+      headers[headerKey] = parsedValue
     }
 
     this.defaultHeaders = {
       ...this.defaultHeaders,
       ...headers
-    };
-  }
-  
-  cache(seconds = DEFAULT_FIVE_MINUTES) {
-    return new Cache({ maxAge: seconds * 1000, max: 100 })
-  }
-
-  cancelRequests(message) {
-    CancelToken.cancel(message);
+    }
   }
 
   request(key, params, options = {}) {
@@ -70,38 +61,23 @@ class Capsule {
       return console.error(`The route ${key} was not defined.`)
     }
 
+    const route = Object.assign({}, this.methods[key])
+    const { method, baseURL } = route.defaults
+
+    // Before get route object we update it's cache
+    options.url = this.replaceDynamicURLParts(route.defaults.url, params)
+
+    this.addHeader(options.headers)
+    options.headers = this.defaultHeaders
+
+    if(route.method === 'get') {
+      options.params = params
+    } else {
+      options.data = params
+    }
+
     return new Promise((resolve, reject) => {
-      const CACHE_REGISTER = !this.methods[key].defaults.cache && options.cache
-      const CACHE_UPDATE = this.methods[key].defaults.cache && options.forceUpdate
-      
-      // Configure a timing based on the input passed / default 5 mins
-      if(CACHE_REGISTER || CACHE_UPDATE) {
-
-        this.methods[key].defaults.cache = this.cache(options.cache)
-
-        // If cache it's marked as false we need to remove it as the axios will resolve the request itself
-        if(options.cache !== false) {
-          delete options.cache
-        }
-      }
-  
-      // Before get route object we update it's cache
-      let route = Object.assign({}, this.methods[key])
-      options.url = this.replaceDynamicURLParts(route.defaults.url, params)
-
-      this.addHeader(options.headers)
-      options.headers = this.defaultHeaders
-  
-      if(route.method === 'get') {
-        options.params = params
-      } else {
-        options.data = params
-      }
-
-      if (this.debug === true) {
-        const { method, baseURL } = route.defaults
-        this.log(`[${method.toUpperCase()}] ${key} -> ${ baseURL + options.url }`)
-      }
+      this.log(`[${method.toUpperCase()}] ${key} -> ${ baseURL + options.url }`)
 
       route.request(options)
       .then(result => {
@@ -111,13 +87,13 @@ class Capsule {
         let data = {}
 
         if(this.isNode) {
-          data = error.response && error.response.data;
+          data = error.response && error.response.data
           if(error.code) {
-            data.code = error.errno;
-            data.message = error.code;
+            data.code = error.errno
+            data.message = error.code
           }
         } else {
-          data.code = error.response.status;
+          data.code = error.response.status
           data.message = error.response.statusText
         }
 
@@ -128,11 +104,7 @@ class Capsule {
           })
         }
 
-        if (this.debug === true) {
-          const { method, baseURL } = route.defaults
-          this.log(`[${method.toUpperCase()}] ${data.code} ${key} -> ${baseURL + options.url}`, 'error')
-        }
-
+        this.log(`[${method.toUpperCase()}] ${data.code} ${key} -> ${baseURL + options.url}`, 'error')
         resolve(data)
       })
     })
@@ -154,18 +126,10 @@ class Capsule {
           return console.error(`The route ${key} already registered`)
         }
 
-        if(options.cache) {
-          options.cache = this.cache(options.cache)
-        } else {
-          options.cache = false
-        }
-
         this.methods[key] = axios.create({
           ...options,
-          cancelToken: CancelToken.token,
           method,
-          baseURL,
-          adapter: cacheAdapterEnhancer(axios.defaults.adapter, { enabledByDefault: false })
+          baseURL
         })
       }
     }
