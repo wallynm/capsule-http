@@ -70,7 +70,7 @@ class Capsule {
     this.addHeader(options.headers)
     options.headers = this.defaultHeaders
 
-    if(route.method === 'get') {
+    if(method === 'get') {
       options.params = params
     } else {
       options.data = params
@@ -79,7 +79,10 @@ class Capsule {
     return new Promise((resolve, reject) => {
       this.log(`[${method.toUpperCase()}] ${key} -> ${ baseURL + options.url }`)
 
-      route.request(options)
+      route.request({
+        ...route.defaults,
+        ...options
+      })
       .then(result => {
         const data = (options.fullResult && options.fullResult === true) ? result : result.data
         resolve(data)
