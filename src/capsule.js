@@ -14,7 +14,7 @@ class Capsule {
   }
 
   get isNode () {
-    return typeof global !== "undefined" && ({}).toString.call(global) === '[object global]'
+    return typeof process === 'undefined' || process.type === 'renderer' || process.browser === true || process.__nwjs
   }
   
   log(message, type = 'success') {
