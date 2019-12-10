@@ -4,6 +4,7 @@ Capsule.register('https://httpbin.org', {
   get: {
     'fetch.basic': {
       url: '/get'
-    }
+    },
+    'fetch.error': '/error'
   }
 })

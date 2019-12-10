@@ -1,6 +1,6 @@
 {
   "name": "capsule-http",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "main": "dist/capsule-http.cjs.js",
   "browser": "dist/capsule-http.esm.js",
   "module": "dist/capsule-http.umd.js",
@@ -8,15 +8,17 @@
     "axios": "^0.19.0"
   },
   "devDependencies": {
-    "json-server": "^0.15.0",
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "babel-jest": "^24.8.0",
+    "body-parser": "^1.19.0",
     "jest": "^24.8.0",
+    "json-server": "^0.15.0",
     "rollup": "^1.18.0",
     "rollup-plugin-commonjs": "^10.0.0",
     "rollup-plugin-json": "^4.0.0",
-    "rollup-plugin-node-resolve": "^5.1.0"
+    "rollup-plugin-node-resolve": "^5.1.0",
+    "supertest": "^4.0.2"
   },
   "scripts": {
     "build": "rollup -c",

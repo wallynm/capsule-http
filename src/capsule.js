@@ -84,17 +84,21 @@ class Capsule {
         const data = (options.fullResult && options.fullResult === true) ? result : result.data
         resolve(data)
       }).catch(error => {
-        let data = {}
+        let data = {
+          code: error.response.status,
+          message: error.response.statusText
+        }
 
         if(this.isNode) {
           data = error.response && error.response.data
+
           if(error.code) {
-            data.code = error.errno
-            data.message = error.code
+            data = {
+              code: error.errno,
+              message: error.code,
+              ...data
+            }
           }
-        } else {
-          data.code = error.response.status
-          data.message = error.response.statusText
         }
 
         if(typeof this.errorHandler === 'function') {

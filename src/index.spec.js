@@ -1,9 +1,16 @@
 const { Capsule } = require('..')
 const jsonServer = require('json-server')
+
+const app = require('./test/server') // Link to your server file
+const supertest = require('supertest')
+const request = supertest(app)
+
 const server = jsonServer.create()
 const router = jsonServer.router(__dirname + '/utils/db.json')
 const PORT = 3008
 const baseURL = `http://localhost:${PORT}`
+
+
 
 // Register api calls
 Capsule.register(baseURL, {
@@ -38,31 +45,6 @@ describe('Basic API execution', () => {
   })
   afterAll(() => ServerInstance.close())
 
-  describe('register method domain', () => {
-    it('should define baseURL', () => {
-      expect(() => Capsule.register({get: {'fetch.posts': '/posts/:id'}}) ).to.throw("You must define the first parameter the baseURL.");
-    })
-
-    it('should allow register objects params', () => {
-      Capsule.register(baseURL, {
-        get: {
-          'fetch.object.register': {
-            url: '/posts/:id',
-            data: { id: 2 }
-          }
-        }
-      })
-
-      expect(Capsule.methods['fetch.object.register']).to.exist
-      expect(Capsule.methods['fetch.object.register'].defaults.url).toEqual('/posts/:id')
-      expect(Capsule.methods['fetch.object.register'].defaults.data.id).toEqual(2)
-    })
-    
-    it('shouldn\'t allow duplicated key names', () => {
-      expect(() => Capsule.register(baseURL, {get: {'fetch.posts': '/posts/:id'}}) ).to.throw("The route fetch.posts already registered");
-    })
-  })
-
   describe('GET method', () => {
     it('should execute with success', async () => {  
       const result = await Capsule.request('fetch.posts', { id: 1})
@@ -94,35 +76,55 @@ describe('Basic API execution', () => {
       const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
       expect(result).toEqual(expect.objectContaining({title: "json-server"}))
     })
-  })
 
-  describe('Caching data', () => {
-    const stringToBeCached = randString()
-
-    it('should keep the GET result cached', async () => {
-      const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 300 })
-      await Capsule.request('update.post', { id: 3, title: stringToBeCached })
-      const normalResult = await Capsule.request('fetch.posts', { id: 3 })
-      expect(cachedResult).toEqual(normalResult)
-    })
-
-    it('should have same value as first cache GET', async () => {
-      const normalResult = await Capsule.request('fetch.posts', { id: 3 })
-      expect(normalResult.title).not.toEqual(stringToBeCached)
-    })
-
-    it('should clean cache correctly with flag "cache" false', async () => {
-      const noCacheResult = await Capsule.request('fetch.posts', { id: 3}, { cache: false })
-      expect(stringToBeCached).toEqual(noCacheResult.title)
-    })
-
-    it('should clean cache correctly after defined time', async () => {
-      const newString = randString()
-      const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 0.1, forceUpdate: true })
-      await Capsule.request('update.post', { id: 3, title: newString })
-      await sleep(100)
-      const normalResult = await Capsule.request('fetch.posts', { id: 3 })
-      expect(cachedResult).not.toEqual(normalResult)
+    it('should apply query params correctly', async () => {  
+      const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
+      expect(result).toEqual(expect.objectContaining({title: "json-server"}))
     })
   })
+
+  describe('NodeJS Capsule Testing', () => {
+    it('gets the test endpoint', async done => {
+      const response = await request.get('/test')
+    
+      expect(response.status).toBe(200)
+      expect(response.body.url).toBe('https://httpbin.org/get')
+      done()
+    })
+    it('handles error correctly', async done => {
+      const response = await request.get('/error')
+      expect(response.status).toBe(500)
+      done()
+    })
+  })
+
+  // describe('Caching data', () => {
+  //   const stringToBeCached = randString()
+
+  //   it('should keep the GET result cached', async () => {
+  //     const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 300 })
+  //     await Capsule.request('update.post', { id: 3, title: stringToBeCached })
+  //     const normalResult = await Capsule.request('fetch.posts', { id: 3 })
+  //     expect(cachedResult).toEqual(normalResult)
+  //   })
+
+  //   it('should have same value as first cache GET', async () => {
+  //     const normalResult = await Capsule.request('fetch.posts', { id: 3 })
+  //     expect(normalResult.title).not.toEqual(stringToBeCached)
+  //   })
+
+  //   it('should clean cache correctly with flag "cache" false', async () => {
+  //     const noCacheResult = await Capsule.request('fetch.posts', { id: 3}, { cache: false })
+  //     expect(stringToBeCached).toEqual(noCacheResult.title)
+  //   })
+
+  //   it('should clean cache correctly after defined time', async () => {
+  //     const newString = randString()
+  //     const cachedResult = await Capsule.request('fetch.posts', { id: 3}, { cache: 0.1, forceUpdate: true })
+  //     await Capsule.request('update.post', { id: 3, title: newString })
+  //     await sleep(100)
+  //     const normalResult = await Capsule.request('fetch.posts', { id: 3 })
+  //     expect(cachedResult).not.toEqual(normalResult)
+  //   })
+  // })
 })
