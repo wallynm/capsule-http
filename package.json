@@ -1,6 +1,6 @@
 {
   "name": "capsule-http",
-  "version": "1.1.12",
+  "version": "1.1.14",
   "main": "dist/capsule-http.cjs.js",
   "browser": "dist/capsule-http.esm.js",
   "module": "dist/capsule-http.umd.js",
@@ -23,7 +23,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "test": "jest --forceExit",
+    "test": "jest --forceExit --env=node",
     "pretest": "npm run build"
   },
   "files": [

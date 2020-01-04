@@ -5,11 +5,12 @@ const DEFAULT_FIVE_MINUTES = 5000
 
 class Capsule {
   constructor() {
-    this.req = this.request.bind(this, true)
-    this.methods = []
-    this.debug = false
     this.http = axios
+    this.req = this.request.bind(this, true)
+    this.debug = false
     this.errorHandler = null
+    this.methods = []
+    this.configParams = {}
     this.defaultHeaders = {}
   }
 
@@ -44,16 +45,8 @@ class Capsule {
     this.errorHandler = method
   }
 
-  addHeader(headers = {}) {
-    for (const [headerKey, value] of Object.entries(headers)) {
-      const parsedValue = (typeof value === 'function') ? value() : value
-      headers[headerKey] = parsedValue
-    }
-
-    this.defaultHeaders = {
-      ...this.defaultHeaders,
-      ...headers
-    }
+  config(configParams) {
+    this.configParams = configParams
   }
 
   request(key, params, options = {}) {
@@ -63,12 +56,15 @@ class Capsule {
 
     const route = Object.assign({}, this.methods[key])
     const { method, baseURL } = route.defaults
+    const { headers, ...configs } = this.configParams
 
     // Before get route object we update it's cache
     options.url = this.replaceDynamicURLParts(route.defaults.url, params)
 
-    this.addHeader(options.headers)
-    options.headers = this.defaultHeaders
+    options.headers = {
+      ...this.defaultHeaders,
+      ...headers
+    }
 
     if(method === 'get') {
       options.params = params
@@ -79,10 +75,12 @@ class Capsule {
     return new Promise((resolve, reject) => {
       this.log(`[${method.toUpperCase()}] ${key} -> ${ baseURL + options.url }`)
 
-      route.request({
-        ...route.defaults,
+      const obj = {
+        ...configs,
         ...options
-      })
+      }
+
+      route.request(obj)
       .then(result => {
         const data = (options.fullResult && options.fullResult === true) ? result : result.data
         resolve(data)
