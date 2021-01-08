@@ -25,15 +25,15 @@ app.get('/test', async (req, res) => {
 
 // create a route for the app
 app.get('/error', async (req, res) => {
-  try {
-    const data = await Capsule.request('fetch.error')
-    return res.json(data.test.info);
-  } catch(err) {
-    return res.status(500).send({ 
+  // try {
+  //   const data = await Capsule.request('fetch.error')
+  //   return res.json(data.test.info);
+  // } catch(err) {
+    res.status(500).send({ 
       error: 'Something failed!',
       code: 500
     });
-  }
+  // }
 });
 
 // make the server listen to requests

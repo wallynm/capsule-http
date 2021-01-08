@@ -18,6 +18,7 @@ Capsule.register(baseURL, {
     'fetch.posts': '/posts/:id',
     'fetch.post': '/post',
     'fetch.mongodb.post': '/posts/3',
+    'fetch.get.error': '/error'
   },
   post: {
     'insert.post': '/posts'
@@ -85,15 +86,15 @@ describe('Basic API execution', () => {
 
   describe('NodeJS Capsule Testing', () => {
     it('gets the test endpoint', async done => {
-      const response = await request.get('/test')
-    
+      const response = await request.get('/test')    
       expect(response.status).toBe(200)
       expect(response.body.url).toBe('https://httpbin.org/get')
       done()
     })
-    it('handles error correctly', async done => {
-      const response = await request.get('/error')
-      expect(response.status).toBe(500)
+
+    it('gets the test endpoint', async done => {
+      const result = await Capsule.request('fetch.get.error')
+      expect(result.code).toBe(404)
       done()
     })
   })
