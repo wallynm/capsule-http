@@ -41,10 +41,6 @@ class Capsule {
     this.debug = true
   }
 
-  globalErrorHandler(method) {
-    this.errorHandler = method
-  }
-
   config(configParams) {
     this.configParams = configParams
   }
@@ -54,9 +50,9 @@ class Capsule {
       return console.error(`The route ${key} was not defined.`)
     }
 
-    const route = Object.assign({}, this.methods[key])
-    const { method, baseURL } = route.defaults
-    const { headers, ...configs } = this.configParams
+    const route = Object.assign({}, this.methods[key]);
+    const { method, baseURL } = route.defaults;
+    const { errorHandler, headers, ...configs } = this.configParams;
 
     // Before get route object we update it's cache
     options.url = this.replaceDynamicURLParts(route.defaults.url, params)
@@ -76,19 +72,17 @@ class Capsule {
       this.log(`[${method.toUpperCase()}] ${key} -> ${ baseURL + options.url }`)
 
       const obj = {
+        // validateStatus: false,
         ...configs,
         ...options
       }
 
       route.request(obj)
       .then(result => {
-        const data = (options.fullResult && options.fullResult === true) ? result : result.data
+        const data = (options.fullResult && options.fullResult === true) ? result : result.data;
         resolve(data)
       }).catch(error => {
-        let data = {
-          code: error.response.status,
-          message: error.response.statusText
-        }
+        let data = {};
 
         if(this.isNode) {
           data = error.response && error.response.data
@@ -100,17 +94,21 @@ class Capsule {
               ...data
             }
           }
+        } else {
+          data = {
+            code: error.response.status,
+            message: error.response.statusText
+          };
         }
 
-        if(typeof this.errorHandler === 'function') {
-          this.errorHandler({
+        if(typeof errorHandler === 'function') {
+          errorHandler({
             ...data,
             url: options.url
           })
         }
 
-        this.log(`[${method.toUpperCase()}] ${data.code} ${key} -> ${baseURL + options.url}`, 'error')
-        resolve(data)
+        resolve(data);
       })
     })
   }
