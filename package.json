@@ -5,7 +5,7 @@
   "browser": "dist/capsule-http.esm.js",
   "module": "dist/capsule-http.umd.js",
   "dependencies": {
-    "axios": "0.21.4"
+    "axios": "0.21.2"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
