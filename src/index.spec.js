@@ -9,10 +9,8 @@ const server = jsonServer.create()
 const router = jsonServer.router(__dirname + '/utils/db.json')
 const PORT = 3008
 const baseURL = `http://localhost:${PORT}`
+jest.setTimeout(1000)
 
-
-
-// Register api calls
 Capsule.register(baseURL, {
   get: {
     'fetch.posts': '/posts/:id',
@@ -30,6 +28,7 @@ Capsule.register(baseURL, {
     'remove.post': '/posts/:id'
   }
 })
+// Register api calls
 
 function randString() {
   return (+new Date * Math.random()).toString(36).substring(0,6)  
@@ -53,14 +52,14 @@ describe('Basic API execution', () => {
     })
 
     it('should return the object data', async () => {  
-      const result = await Capsule.request('fetch.posts', { id: 1})
+      const result = await Capsule.request('fetch.posts', { id: 2})
       expect(typeof result).toEqual('object')
     })
 
     it('should execute GET method with success and retrieve data', async () => {  
-      const result = await Capsule.request('fetch.posts', { id: 1})
+      const result = await Capsule.request('fetch.posts', { id: 3})
       expect(typeof result).toEqual('object')
-      expect(result).toEqual(expect.objectContaining({title: "json-server", id: 1}))
+      expect(result).toEqual(expect.objectContaining({title: "4pr148", id: 3}))
     })
 
     it('should return object even using fixed params', async () => {  
@@ -69,18 +68,18 @@ describe('Basic API execution', () => {
     })
 
     it('should include all properties', async () => {
-      const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
-      expect(result).toEqual(expect.objectContaining({title: "json-server"}))
+      const result = await Capsule.request('fetch.posts', { id: 4 })
+      expect(result).toEqual(expect.objectContaining({title: "Test"}))
     })
 
     it('should apply query params correctly', async () => {  
-      const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
-      expect(result).toEqual(expect.objectContaining({title: "json-server"}))
+      const result = await Capsule.request('fetch.posts', { id: 5 })
+      expect(result).toEqual(expect.objectContaining({title: "Test 5"}))
     })
 
     it('should apply query params correctly', async () => {  
-      const result = await Capsule.request('fetch.posts', { id: 1, title: "json-server"})
-      expect(result).toEqual(expect.objectContaining({title: "json-server"}))
+      const result = await Capsule.request('fetch.posts', { id: 6 })
+      expect(result).toEqual(expect.objectContaining({title: "Test 6"}))
     })
   })
 
@@ -93,8 +92,78 @@ describe('Basic API execution', () => {
     })
 
     it('gets the test endpoint', async done => {
-      const result = await Capsule.request('fetch.get.error')
-      expect(result.code).toBe(404)
+      const result = await Capsule.request('fetch.posts',
+        { id: 7 },
+      )
+      expect(result).toEqual(expect.objectContaining({title: "Test 7"}))
+      done()
+    })
+
+    it('Ensures the request receives params correctly', async done => {
+      const logSpy = jest.spyOn(Capsule.methods['fetch.posts'], 'request');
+      await Capsule.request('fetch.posts',
+        { id: 8, "title": "json-server" }
+      )
+
+      expect(logSpy).toBeCalledWith({
+        "headers": {},
+        "params": {"id": 8, "title": "json-server"},
+        "url": "/posts/8"
+      });
+      done()
+    })
+    it('Ensures that dynamic request applies headers correctly', async done => {
+      const logTest = jest.spyOn(Capsule.methods['fetch.posts'], 'request');
+      await Capsule.request('fetch.posts', { id: 9}, { headers: {"X-Test-Config": true }})
+
+
+      expect(logTest).toBeCalledWith({
+        "headers": {"X-Test-Config": true},
+        "params": {"id": 9},
+        "url": "/posts/9"
+      });
+      done()
+    })
+
+    it('Ensures that default headers gets merged with custom headers', async done => {
+      Capsule.config({
+        headers: {
+          'Test-Config': true
+        }
+      })
+      
+      const logA = jest.spyOn(Capsule.methods['fetch.posts'], 'request');
+      await Capsule.request('fetch.posts', { id: 10}, { headers: {"Config": true }})
+
+      expect(logA).toBeCalledWith(
+        expect.objectContaining({
+          "headers": { "Test-Config": true, "Config": true },
+          "params": {"id": 10},
+          "url": "/posts/10"
+        })
+      )
+
+      done()
+    })
+
+    it('Ensures that custom headers have prefference over default ones', async done => {
+      Capsule.config({
+        headers: {
+          'Test-Config': false
+        }
+      })
+      
+      const logA = jest.spyOn(Capsule.methods['fetch.posts'], 'request');
+      await Capsule.request('fetch.posts', { id: 10}, { headers: {"Test-Config": true }})
+
+      expect(logA).toBeCalledWith(
+        expect.objectContaining({
+          "headers": { "Test-Config": true },
+          "params": {"id": 10},
+          "url": "/posts/10"
+        })
+      )
+
       done()
     })
   })

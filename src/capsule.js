@@ -56,10 +56,10 @@ class Capsule {
 
     // Before get route object we update it's cache
     options.url = this.replaceDynamicURLParts(route.defaults.url, params)
-
     options.headers = {
       ...this.defaultHeaders,
-      ...headers
+      ...headers,
+      ...options.headers
     }
 
     if(method === 'get') {
@@ -95,6 +95,7 @@ class Capsule {
             }
           }
         } else {
+          console.info(error)
           data = {
             code: error.response.status,
             message: error.response.statusText
